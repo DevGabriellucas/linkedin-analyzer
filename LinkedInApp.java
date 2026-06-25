@@ -1,13 +1,16 @@
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 /**
- * Aplicação de demonstração do {@link LinkedInAnalyzer}.
+ * Aplicação de console do {@link LinkedInAnalyzer}.
  *
- * <p>Monta o cenário sugerido no enunciado do projeto e executa as cinco
- * missões, imprimindo os resultados de forma legível no console.
+ * <p>Monta o cenário sugerido no enunciado e oferece um <b>menu interativo</b>
+ * para o usuário executar cada missão informando os nomes, além de uma opção que
+ * roda a demonstração completa do cenário de testes de uma só vez.
  *
  * <p>===================================================================
- * <p>INTEGRANTES DO GRUPO (preencher antes de entregar):
+ * <p>INTEGRANTES DO GRUPO:
  * <ul>
  *   <li>Gabriel Lucas de Araujo Bandeira — 38821672</li>
  *   <li>Marcos Manoel — 38490137</li>
@@ -22,15 +25,60 @@ public class LinkedInApp {
         LinkedInAnalyzer analyzer = new LinkedInAnalyzer(rede);
 
         System.out.println("==============================================");
-        System.out.println("        LINKEDIN ANALYZER - DEMONSTRACAO      ");
+        System.out.println("            LINKEDIN ANALYZER                 ");
         System.out.println("==============================================");
 
-        demonstrarSugestaoDeConexoes(analyzer, "Ana");
-        demonstrarGrauDeSeparacao(analyzer, "Ana", "Fernanda");
-        demonstrarGrauDeSeparacao(analyzer, "Ana", "Gabriel"); // sub-redes diferentes -> -1
-        demonstrarRotaDeMaiorAfinidade(analyzer, "Ana", "Fernanda");
-        demonstrarRotaDeMaiorAfinidade(analyzer, "Ana", "Igor"); // inalcancavel -> -1
-        demonstrarGruposIsolados(analyzer);
+        try (Scanner scanner = new Scanner(System.in)) {
+            boolean executando = true;
+            while (executando) {
+                imprimirMenu(rede);
+                String opcao = scanner.nextLine().trim();
+                try {
+                    executando = processarOpcao(opcao, analyzer, scanner);
+                } catch (NoSuchElementException e) {
+                    // Nome digitado nao existe na rede: avisa e mantem o programa vivo.
+                    System.out.println("  [ERRO] " + e.getMessage());
+                }
+            }
+        }
+        System.out.println("\nEncerrando. Ate mais!");
+    }
+
+    /**
+     * Trata a opção escolhida no menu.
+     *
+     * @return {@code false} quando o usuário pede para sair; {@code true} caso contrário
+     */
+    private static boolean processarOpcao(String opcao, LinkedInAnalyzer analyzer, Scanner scanner) {
+        switch (opcao) {
+            case "1":
+                demonstrarSugestaoDeConexoes(analyzer, lerNome(scanner, "Digite o nome da pessoa: "));
+                break;
+            case "2":
+                demonstrarGrauDeSeparacao(analyzer,
+                        lerNome(scanner, "Pessoa de origem: "),
+                        lerNome(scanner, "Pessoa de destino: "));
+                break;
+            case "3":
+                demonstrarRotaDeMaiorAfinidade(analyzer,
+                        lerNome(scanner, "Pessoa de origem: "),
+                        lerNome(scanner, "Pessoa de destino: "));
+                break;
+            case "4":
+                demonstrarGruposIsolados(analyzer);
+                break;
+            case "5":
+                demonstrarRankingDeInfluencia(analyzer);
+                break;
+            case "6":
+                rodarDemonstracaoCompleta(analyzer);
+                break;
+            case "0":
+                return false;
+            default:
+                System.out.println("  Opcao invalida. Escolha um numero do menu.");
+        }
+        return true;
     }
 
     /**
@@ -56,6 +104,23 @@ public class LinkedInApp {
         return rede;
     }
 
+    /**
+     * Executa todas as missões de uma vez, com o cenário sugerido no enunciado.
+     * (Garante o requisito de "rodar o cenario de testes" em um unico comando.)
+     */
+    private static void rodarDemonstracaoCompleta(LinkedInAnalyzer analyzer) {
+        System.out.println("\n##############################################");
+        System.out.println("#       DEMONSTRACAO COMPLETA DO CENARIO      #");
+        System.out.println("##############################################");
+        demonstrarSugestaoDeConexoes(analyzer, "Ana");
+        demonstrarGrauDeSeparacao(analyzer, "Ana", "Fernanda");
+        demonstrarGrauDeSeparacao(analyzer, "Ana", "Gabriel"); // sub-redes diferentes -> -1
+        demonstrarRotaDeMaiorAfinidade(analyzer, "Ana", "Fernanda");
+        demonstrarRotaDeMaiorAfinidade(analyzer, "Ana", "Igor"); // inalcancavel -> -1
+        demonstrarGruposIsolados(analyzer);
+        demonstrarRankingDeInfluencia(analyzer);
+    }
+
     // ---------------------------------------------------------------------
     // Demonstrações de cada missão
     // ---------------------------------------------------------------------
@@ -64,7 +129,7 @@ public class LinkedInApp {
         imprimirTitulo("MISSAO 2 - Sugestao de conexoes para " + pessoa);
         List<LinkedInAnalyzer.Sugestao> sugestoes = analyzer.sugerirConexoes(pessoa);
         if (sugestoes.isEmpty()) {
-            System.out.println("Nenhuma sugestao encontrada.");
+            System.out.println("  Nenhuma sugestao encontrada.");
         } else {
             for (LinkedInAnalyzer.Sugestao sugestao : sugestoes) {
                 System.out.println("  - " + sugestao);
@@ -102,6 +167,38 @@ public class LinkedInApp {
             System.out.println("  Sub-rede " + indice + ": " + grupo);
             indice++;
         }
+    }
+
+    private static void demonstrarRankingDeInfluencia(LinkedInAnalyzer analyzer) {
+        imprimirTitulo("MISSAO 6 (BONUS) - Ranking de influencia (mais conectados)");
+        List<LinkedInAnalyzer.Influencia> ranking = analyzer.rankingDeInfluencia();
+        int posicao = 1;
+        for (LinkedInAnalyzer.Influencia influencia : ranking) {
+            System.out.println("  " + posicao + "o lugar: " + influencia);
+            posicao++;
+        }
+    }
+
+    // ---------------------------------------------------------------------
+    // Apoio de interface (menu e leitura de entrada)
+    // ---------------------------------------------------------------------
+
+    private static void imprimirMenu(Grafo<String> rede) {
+        System.out.println("\n----------------- MENU -----------------");
+        System.out.println("Pessoas na rede: " + rede.getVertices());
+        System.out.println("  1 - Sugerir conexoes (amigos de 2o grau)");
+        System.out.println("  2 - Grau de separacao entre duas pessoas");
+        System.out.println("  3 - Rota de maior afinidade entre duas pessoas");
+        System.out.println("  4 - Mapear grupos isolados (sub-redes)");
+        System.out.println("  5 - Ranking de influencia");
+        System.out.println("  6 - Rodar demonstracao completa do cenario");
+        System.out.println("  0 - Sair");
+        System.out.print("Escolha uma opcao: ");
+    }
+
+    private static String lerNome(Scanner scanner, String prompt) {
+        System.out.print(prompt);
+        return scanner.nextLine().trim();
     }
 
     private static void imprimirTitulo(String titulo) {

@@ -31,6 +31,7 @@ A rede é modelada como um **grafo não-direcionado e ponderado**:
 | 3 | Grau de separação (menor nº de passos) | `grauDeSeparacao(String, String)` | **BFS** |
 | 4 | Rota e custo de maior afinidade | `rotaDeMaiorAfinidade(String, String)` | **Dijkstra** |
 | 5 | Mapear grupos isolados (sub-redes) | `mapearGruposIsolados()` | Componentes conexos (BFS) |
+| 6 ⭐ | Ranking de influência (bônus) | `rankingDeInfluencia()` | Centralidade de grau |
 
 > **Por que dois algoritmos diferentes?**
 > A Missão 3 usa **BFS** porque o que importa é o número de saltos (todas as arestas valem 1 passo).
@@ -59,6 +60,23 @@ Pré-requisito: **JDK 17+** instalado (`java -version` deve responder).
 javac Grafo.java LinkedInAnalyzer.java LinkedInApp.java
 java LinkedInApp
 ```
+
+A aplicação abre um **menu interativo** no console:
+
+```
+----------------- MENU -----------------
+  1 - Sugerir conexoes (amigos de 2o grau)
+  2 - Grau de separacao entre duas pessoas
+  3 - Rota de maior afinidade entre duas pessoas
+  4 - Mapear grupos isolados (sub-redes)
+  5 - Ranking de influencia
+  6 - Rodar demonstracao completa do cenario
+  0 - Sair
+```
+
+> A opção **6** roda todas as missões com o cenário sugerido de uma só vez.
+> As opções **1, 2 e 3** pedem os nomes das pessoas. Nomes inexistentes são
+> tratados com uma mensagem de erro, sem encerrar o programa.
 
 ---
 
@@ -120,6 +138,14 @@ MISSAO 5 - Grupos isolados (sub-redes / componentes conexos)
   Sub-rede 1: [Ana, Bruno, Carlos, Daniela, Eduardo, Fernanda]
   Sub-rede 2: [Gabriel, Hugo]
   Sub-rede 3: [Igor, Juliana]
+
+----------------------------------------------
+MISSAO 6 (BONUS) - Ranking de influencia (mais conectados)
+----------------------------------------------
+  1o lugar: Ana (3 conexoes)
+  2o lugar: Eduardo (3 conexoes)
+  3o lugar: Bruno (2 conexoes)
+  ...
 ```
 
 > 💡 Repare na Missão 4: a rota mais curta em **saltos** seria `Ana → Daniela → Fernanda`

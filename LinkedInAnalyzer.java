@@ -203,6 +203,33 @@ public class LinkedInAnalyzer {
         return subRedes;
     }
 
+    // =====================================================================
+    // Missão 6 (bônus) — Ranking de Influência (centralidade de grau)
+    // =====================================================================
+
+    /**
+     * Gera o ranking de influência da rede com base na <b>centralidade de grau</b>:
+     * a métrica mais simples de influência em redes sociais. Quanto mais conexões
+     * diretas uma pessoa tem, mais influente/central ela é considerada.
+     *
+     * <p>Percorremos todos os vértices e contamos o número de vizinhos (grau) de
+     * cada um. Complexidade O(V).
+     *
+     * @return lista de {@link Influencia} ordenada do mais influente para o menos
+     *         influente (desempate alfabético, para saída determinística)
+     */
+    public List<Influencia> rankingDeInfluencia() {
+        List<Influencia> ranking = new ArrayList<>();
+        for (String pessoa : rede.getVertices()) {
+            int conexoes = rede.getVizinhos(pessoa).size();
+            ranking.add(new Influencia(pessoa, conexoes));
+        }
+        // Mais conexoes primeiro; empate resolvido pelo nome.
+        ranking.sort(Comparator.comparingInt(Influencia::getNumeroDeConexoes).reversed()
+                .thenComparing(Influencia::getNome));
+        return ranking;
+    }
+
     // ---------------------------------------------------------------------
     // Apoio interno
     // ---------------------------------------------------------------------
@@ -244,6 +271,39 @@ public class LinkedInAnalyzer {
         public String toString() {
             String plural = amigosEmComum == 1 ? "amigo em comum" : "amigos em comum";
             return nome + " (" + amigosEmComum + " " + plural + ")";
+        }
+    }
+
+    // =====================================================================
+    // Tipo de retorno da Missão 6 (bônus)
+    // =====================================================================
+
+    /**
+     * Representa a posição de uma pessoa no ranking de influência: o nome e o
+     * número de conexões diretas (grau). Imutável.
+     */
+    public static final class Influencia {
+
+        private final String nome;
+        private final int numeroDeConexoes;
+
+        public Influencia(String nome, int numeroDeConexoes) {
+            this.nome = nome;
+            this.numeroDeConexoes = numeroDeConexoes;
+        }
+
+        public String getNome() {
+            return nome;
+        }
+
+        public int getNumeroDeConexoes() {
+            return numeroDeConexoes;
+        }
+
+        @Override
+        public String toString() {
+            String plural = numeroDeConexoes == 1 ? "conexao" : "conexoes";
+            return nome + " (" + numeroDeConexoes + " " + plural + ")";
         }
     }
 }
