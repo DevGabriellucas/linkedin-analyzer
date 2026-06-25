@@ -1,0 +1,16 @@
+# Arquivos compilados Java
+*.class
+
+# Logs
+*.log
+
+# Arquivos do sistema operacional
+Thumbs.db
+.DS_Store
+
+# Pastas de IDE
+.idea/
+.vscode/
+*.iml
+bin/
+out/
