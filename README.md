@@ -156,4 +156,4 @@ MISSAO 6 (BONUS) - Ranking de influencia (mais conectados)
 
 ## 🎥 Vídeo explicativo
 
-[Link do vídeo no YouTube] _(adicionar antes da entrega — público ou não listado)_
+[https://youtu.be/8x5lWsmO4KY?is=PS3nH9HCkNFzyZ34 / https://youtu.be/8x5lWsmO4KY?is=n1PxZo_b6MMzBd_Y] _(adicionar antes da entrega — público ou não listado)_
